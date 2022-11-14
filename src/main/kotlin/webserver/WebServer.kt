@@ -17,7 +17,9 @@ fun queryParams(url: String): List<Pair<String, String>> {
   } else {
     val allParams = url.substringAfter("?").split("&")
 
-    allParams.map { x -> x.split("=") }.map { y -> y.zipWithNext() }.flatten()
+    allParams.map { x -> x.split("=") }
+             .map { y -> y.zipWithNext() }
+             .flatten()
   }
 }
 
@@ -40,9 +42,10 @@ fun errorHandler(request: Request): Response
   = Response(Status.NOT_FOUND, "404: PAGE NOT FOUND")
 
 fun helloHandler(request: Request): Response {
-  val paramHandlers = mapOf(Pair("name", ::nameHandler), Pair("style", ::styleHandler))
-  val params        = queryParams(request.url)
-
+  val paramHandlers = mapOf(Pair("name", ::nameHandler),
+                            Pair("style", ::styleHandler))
+  
+  val params = queryParams(request.url)
   var hello = "Hello, World!"
 
   for ( param in params ) {
@@ -63,11 +66,23 @@ fun styleHandler(msg: String, param: String): String {
 }
 
 
-fun configureRoutes(routeMap: Map<String, HttpHandler>): HttpHandler {
-  return { requests -> routeMap[path(requests.url)]!!.invoke(requests) }
+fun configureRoutes(routeMap: Map<String, HttpHandler>): HttpHandler
+  = { requests -> routeMap[path(requests.url)]!!.invoke(requests) }
 
-
+fun requireToken(token: String, wrapped: HttpHandler): HttpHandler {
+  return { request ->
+    // checks for the case where token is valid
+    if ( request.authToken == token ) {
+      wrapped.invoke(request)
+    } else {
+      Response(Status.FORBIDDEN, "INVALID AUTHORIZATION TOKEN PASSED")
+    }
+  }
 }
+
+fun examMarksHandler(request: Request): Response
+  = Response(Status.OK, "This is very secret.")
+
 fun main() {
   println(path("http://www.imperial.ac.uk/"))
 }

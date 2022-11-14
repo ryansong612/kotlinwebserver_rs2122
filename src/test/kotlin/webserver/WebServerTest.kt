@@ -9,6 +9,9 @@ class WebServerTest {
   fun `can extract scheme`() {
     assertEquals("http", scheme("http://www.imperial.ac.uk/"))
     assertEquals("https", scheme("https://www.imperial.ac.uk/"))
+    assertEquals("http", scheme("http://www.google.com/search?q=kotin"))
+    assertEquals("https", scheme("https://www.google.com/search?q=kotin&safe=active"))
+    assertEquals("https", scheme("https://ipv6.google.com"))
   }
 
   @Test
@@ -17,6 +20,9 @@ class WebServerTest {
     assertEquals("www.imperial.ac.uk", host("https://www.imperial.ac.uk/"))
     assertEquals("www.imperial.ac.uk", host("https://www.imperial.ac.uk/computing"))
     assertEquals("www.imperial.ac.uk", host("https://www.imperial.ac.uk/computing/programming"))
+    assertEquals("www.google.com", host("https://www.google.com/search?q=kotin&safe=active"))
+    assertEquals("www.google.com", host("http://www.google.com/search?q=kotin"))
+    assertEquals("www.baidu.com", host("https://www.baidu.com/"))
   }
 
   @Test
@@ -26,6 +32,9 @@ class WebServerTest {
     assertEquals("/computing", path("https://www.imperial.ac.uk/computing"))
     assertEquals("/computing/programming", path("https://www.imperial.ac.uk/computing/programming"))
     assertEquals("/computing", path("https://www.imperial.ac.uk/computing?q=abc"))
+    assertEquals("/search", path("http://www.google.com/search?q=kotin"))
+    assertEquals("/computing/programming/exam-marks",
+      path("https://imperial.ac.uk/computing/programming/exam-marks"))
   }
 
   @Test
@@ -97,7 +106,8 @@ class WebServerTest {
   fun `filter prevents access to protected resources `() {
 
     val app = configureRoutes(mapOf(Pair("/", ::homePageHandler), Pair("/say-hello", ::helloHandler),
-      Pair("/computing", ::computingPageHandler)))
+      Pair("/computing", ::computingPageHandler),
+      Pair("/exam-marks", requireToken("password1", ::examMarksHandler))))
 
     val request = Request("http://www.imperial.ac.uk/exam-marks")
     assertEquals(Status.FORBIDDEN, app(request).status)
@@ -107,7 +117,8 @@ class WebServerTest {
   fun `filter allows access to protected resources with token`() {
 
     val app = configureRoutes(mapOf(Pair("/", ::homePageHandler), Pair("/say-hello", ::helloHandler),
-      Pair("/computing", ::computingPageHandler)))
+      Pair("/computing", ::computingPageHandler),
+      Pair("/exam-marks", requireToken("password1", ::examMarksHandler))))
 
     val request = Request("http://www.imperial.ac.uk/exam-marks", "password1")
     assertEquals(Status.OK, app(request).status)
