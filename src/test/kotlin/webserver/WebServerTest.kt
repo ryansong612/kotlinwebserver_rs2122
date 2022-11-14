@@ -33,14 +33,14 @@ class WebServerTest {
     assertEquals("/computing/programming", path("https://www.imperial.ac.uk/computing/programming"))
     assertEquals("/computing", path("https://www.imperial.ac.uk/computing?q=abc"))
     assertEquals("/search", path("http://www.google.com/search?q=kotin"))
-    assertEquals("/computing/programming/exam-marks",
-      path("https://imperial.ac.uk/computing/programming/exam-marks"))
+    assertEquals("/computing/programming/exam-marks", path("https://imperial.ac.uk/computing/programming/exam-marks"))
   }
 
   @Test
   fun `can extract query params`() {
     assertEquals(listOf(Pair("q", "xxx")), queryParams("http://www.imperial.ac.uk/?q=xxx"))
     assertEquals(listOf(Pair("q", "xxx"), Pair("rr", "zzz")), queryParams("http://www.imperial.ac.uk/?q=xxx&rr=zzz"))
+    assertEquals(listOf(Pair("q", "kotlin"), Pair("safe","active")), queryParams("https://www.google.com/search?q=kotlin&safe=active"))
   }
 
   @Test
