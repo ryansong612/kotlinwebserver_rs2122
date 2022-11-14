@@ -1,7 +1,9 @@
 package webserver
 
-// write your web framework code here:
+import java.util.ResourceBundle
 
+// write your web framework code here:
+typealias HttpHandler = (Request) -> Response
 fun scheme(url: String): String
   = url.substringBefore(":")
 fun host(url: String): String
@@ -27,7 +29,6 @@ fun route(request: Request): Response {
       "/"          -> homePageHandler(request)
       "/say-hello" -> helloHandler(request)
       "/computing" -> computingPageHandler(request)
-      "/search"    -> searchPageHandler(request)
       else         -> errorHandler(request)
   }
 }
@@ -37,8 +38,6 @@ fun computingPageHandler(request: Request): Response
   = Response(Status.OK, "This is DoC.")
 fun errorHandler(request: Request): Response
   = Response(Status.NOT_FOUND, "404: PAGE NOT FOUND")
-fun searchPageHandler(request: Request): Response
-  = Response(Status.OK, "What would you like to know about ICL?")
 
 fun helloHandler(request: Request): Response {
   val paramHandlers = mapOf(Pair("name", ::nameHandler), Pair("style", ::styleHandler))
@@ -61,6 +60,12 @@ fun styleHandler(msg: String, param: String): String {
     "whispering" -> msg.lowercase()
     else         -> msg
   }
+}
+
+
+fun configureRoutes(routeMap: Map<String, HttpHandler>): HttpHandler {
+  return { requests -> routeMap[path(requests.url)]!!.invoke(requests) }
+
 
 }
 fun main() {
