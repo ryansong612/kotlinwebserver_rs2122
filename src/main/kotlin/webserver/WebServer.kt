@@ -2,9 +2,12 @@ package webserver
 
 // write your web framework code here:
 
-fun scheme(url: String): String = url.substringBefore(":")
-fun host(url: String): String   = url.substringAfter("://").substringBefore("/")
-fun path(url: String): String   = url.substringAfter(host(url)).substringBefore("?")
+fun scheme(url: String): String
+  = url.substringBefore(":")
+fun host(url: String): String
+  = url.substringAfter("://").substringBefore("/")
+fun path(url: String): String
+  = url.substringAfter(host(url)).substringBefore("?")
 
 fun queryParams(url: String): List<Pair<String, String>> {
   return if (url.substringAfter(host(url)) == "") {
@@ -21,45 +24,45 @@ fun queryParams(url: String): List<Pair<String, String>> {
 fun route(request: Request): Response {
   val url = request.url
   return when (path(url)) {
-      "/" -> homePageHandler(request)
+      "/"          -> homePageHandler(request)
       "/say-hello" -> helloHandler(request)
       "/computing" -> computingPageHandler(request)
-      "/search" -> searchPageHandler(request)
-      else -> errorHandler(request)
+      "/search"    -> searchPageHandler(request)
+      else         -> errorHandler(request)
   }
 }
-fun homePageHandler(request: Request): Response      = Response(Status.OK, "This is Imperial.")
-fun computingPageHandler(request: Request): Response = Response(Status.OK, "This is DoC.")
-fun errorHandler(request: Request): Response         = Response(Status.NOT_FOUND, "404: PAGE NOT FOUND")
-fun searchPageHandler(request: Request): Response    = Response(Status.OK, "What would you like to know about ICL?")
+fun homePageHandler(request: Request): Response
+  = Response(Status.OK, "This is Imperial.")
+fun computingPageHandler(request: Request): Response
+  = Response(Status.OK, "This is DoC.")
+fun errorHandler(request: Request): Response
+  = Response(Status.NOT_FOUND, "404: PAGE NOT FOUND")
+fun searchPageHandler(request: Request): Response
+  = Response(Status.OK, "What would you like to know about ICL?")
 
 fun helloHandler(request: Request): Response {
-  val url       = request.url
-  val nameParam = queryParams(url).filter { t -> t.first == "name" }
-  val style     = queryParams(url).filter { t -> t.first == "style" }
+  val paramHandlers = mapOf(Pair("name", ::nameHandler), Pair("style", ::styleHandler))
+  val params        = queryParams(request.url)
 
-  // if there is a query parameter called "name"
-  return if (nameParam.isEmpty()) {
-    when {
-      style.isEmpty()                      -> Response(Status.OK, "Hello, World!")
-      style.first().second == "shouting"   -> Response(Status.OK, "HELLO, WORLD!")
-      style.first().second == "whispering" -> Response(Status.OK, "hello, world")
-      else                                 -> Response(Status.OK, "Invalid Response")
-    }
-  } else {
-    val name      = nameParam.first().second
-    val nameLower = name.lowercase()
-    val nameUpper = name.uppercase()
-    when {
-      style.isEmpty()                      -> Response(Status.OK, "Hello, $name!")
-      style.first().second == "shouting"   -> Response(Status.OK, "HELLO, $nameUpper!")
-      style.first().second == "whispering" -> Response(Status.OK, "hello, $nameLower")
-      else                                 -> Response(Status.OK, "Invalid Response")
-    }
+  var hello = "Hello, World!"
+
+  for ( param in params ) {
+    hello = paramHandlers [param.first]!!.invoke(hello, param.second)
   }
+
+  return Response(Status.OK, hello)
+
 }
 
+fun nameHandler(name: String, param: String): String = "Hello, $param!"
+fun styleHandler(msg: String, param: String): String {
+  return when(param) {
+    "shouting"   -> msg.uppercase()
+    "whispering" -> msg.lowercase()
+    else         -> msg
+  }
 
+}
 fun main() {
   println(path("http://www.imperial.ac.uk/"))
 }
