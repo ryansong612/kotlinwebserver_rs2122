@@ -40,7 +40,7 @@ class WebServerTest {
   fun `can extract query params`() {
     assertEquals(listOf(Pair("q", "xxx")), queryParams("http://www.imperial.ac.uk/?q=xxx"))
     assertEquals(listOf(Pair("q", "xxx"), Pair("rr", "zzz")), queryParams("http://www.imperial.ac.uk/?q=xxx&rr=zzz"))
-    assertEquals(listOf(Pair("q", "kotlin"), Pair("safe","active")), queryParams("https://www.google.com/search?q=kotlin&safe=active"))
+    assertEquals(listOf(Pair("q", "kotlin"), Pair("safe", "active")), queryParams("https://www.google.com/search?q=kotlin&safe=active"))
   }
 
   @Test
@@ -65,6 +65,9 @@ class WebServerTest {
   fun `can process multiple params`() {
     val request = Request("http://www.imperial.ac.uk/say-hello?name=Fred&style=shouting")
     assertEquals("HELLO, FRED!", helloHandler(request).body)
+
+    val request2 = Request("http://www.imperial.ac.uk/say-hello?name=Fred&style=whispering")
+    assertEquals("hello, fred!", helloHandler(request2).body)
   }
 
 // ***** Tests for Routing *****
@@ -94,7 +97,7 @@ class WebServerTest {
   fun `calling configureRoutes() returns app which can handle requests`() {
 
     val app = configureRoutes(mapOf(Pair("/", ::homePageHandler), Pair("/say-hello", ::helloHandler),
-              Pair("/computing", ::computingPageHandler)))
+      Pair("/computing", ::computingPageHandler)))
 
     assertEquals("This is Imperial.", app(Request("http://www.imperial.ac.uk/")).body)
     assertEquals("This is DoC.", app(Request("http://www.imperial.ac.uk/computing")).body)
