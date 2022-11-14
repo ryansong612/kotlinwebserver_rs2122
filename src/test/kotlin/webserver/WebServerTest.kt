@@ -41,11 +41,15 @@ class WebServerTest {
     assertEquals(listOf(Pair("q", "xxx")), queryParams("http://www.imperial.ac.uk/?q=xxx"))
     assertEquals(listOf(Pair("q", "xxx"), Pair("rr", "zzz")), queryParams("http://www.imperial.ac.uk/?q=xxx&rr=zzz"))
     assertEquals(listOf(Pair("q", "kotlin"), Pair("safe", "active")), queryParams("https://www.google.com/search?q=kotlin&safe=active"))
+    assertEquals(listOf(Pair("q", "imperial")), queryParams("http://www.google.com/search?q=imperial"))
+    assertEquals(listOf(Pair("q", "computing")), queryParams("http://www.imperial.ac.uk/search?q=computing"))
   }
 
   @Test
   fun `when no query params in url, empty list is extracted`() {
     assertEquals(listOf(), queryParams("http://www.imperial.ac.uk/"))
+    assertEquals(listOf(), queryParams("http://www.google.com/"))
+    assertEquals(listOf(), queryParams("http://www.imperial.ac.uk/computing"))
   }
 
 
@@ -53,12 +57,24 @@ class WebServerTest {
   fun `says hello world`() {
     val request = Request("http://www.imperial.ac.uk/say-hello")
     assertEquals("Hello, World!", helloHandler(request).body)
+
+    val request2 = Request("http://www.google.com/say-hello")
+    assertEquals("Hello, World!", helloHandler(request2).body)
+
+    val request3 = Request("https://www.baidu.com/say-hello")
+    assertEquals("Hello, World!", helloHandler(request3).body)
   }
 
   @Test
   fun `can be customised with particular name`() {
     val request = Request("http://www.imperial.ac.uk/say-hello?name=Fred")
     assertEquals("Hello, Fred!", helloHandler(request).body)
+
+    val request2 = Request("https://www.imperial.ac.uk/say-hello?name=Ryan")
+    assertEquals("Hello, Ryan!", helloHandler(request2).body)
+
+    val request3 = Request("https://www.google.com/say-hello?name=Carol")
+    assertEquals("Hello, Carol!", helloHandler(request3).body)
   }
 
   @Test
@@ -68,6 +84,12 @@ class WebServerTest {
 
     val request2 = Request("http://www.imperial.ac.uk/say-hello?name=Fred&style=whispering")
     assertEquals("hello, fred!", helloHandler(request2).body)
+
+    val request3 = Request("http://www.google.com/say-hello?name=Ryan&style=shouting")
+    assertEquals("HELLO, RYAN!", helloHandler(request3).body)
+
+    val request4 = Request("https://www.google.com/say-hello?name=Carol&style=whispering")
+    assertEquals("hello, carol!", helloHandler(request4).body)
   }
 
 // ***** Tests for Routing *****
@@ -76,6 +98,12 @@ class WebServerTest {
   fun `can route to hello handler`() {
     val request = Request("http://www.imperial.ac.uk/say-hello?name=Fred")
     assertEquals("Hello, Fred!", route(request).body)
+
+    val request2 = Request("http://www.google.com/say-hello?name=Ryan")
+    assertEquals("Hello, Ryan!", route(request2).body)
+
+    val request3 = Request("https://www.baidu.com/say-hello?name=Carol&style=shouting")
+    assertEquals("HELLO, CAROL!", route(request3).body)
   }
 
   @Test

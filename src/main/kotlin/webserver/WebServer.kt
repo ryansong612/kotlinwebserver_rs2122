@@ -44,16 +44,12 @@ fun errorHandler(request: Request): Response
 fun helloHandler(request: Request): Response {
   val paramHandlers = mapOf(Pair("name", ::nameHandler),
     Pair("style", ::styleHandler))
-
   val params = queryParams(request.url)
   var hello = "Hello, World!"
-
   for (param in params) {
     hello = paramHandlers[param.first]!!.invoke(hello, param.second)
   }
-
   return Response(Status.OK, hello)
-
 }
 
 fun nameHandler(name: String, param: String): String = "Hello, $param!"
@@ -64,7 +60,6 @@ fun styleHandler(msg: String, param: String): String {
     else -> msg
   }
 }
-
 
 fun configureRoutes(routeMap: Map<String, HttpHandler>): HttpHandler
   = { requests -> routeMap[path(requests.url)]!!.invoke(requests) }
