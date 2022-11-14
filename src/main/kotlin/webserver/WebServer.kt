@@ -4,7 +4,7 @@ package webserver
 
 fun scheme(url: String): String = url.substringBefore(":")
 
-fun host(url: String): String = url.substringAfter("://").substringBeforeLast("/")
+fun host(url: String): String = url.substringAfter("://").substringBefore("/")
 
 fun path(url: String): String = url.substringAfter(host(url)).substringBefore("?")
 
