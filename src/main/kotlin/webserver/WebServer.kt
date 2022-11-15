@@ -41,8 +41,10 @@ fun errorHandler(request: Request): Response =
   Response(Status.NOT_FOUND, "404: PAGE NOT FOUND")
 
 fun helloHandler(request: Request): Response {
-  val paramHandlers = mapOf(Pair("name", ::nameHandler),
-    Pair("style", ::styleHandler))
+  val paramHandlers = mapOf(
+                            Pair("name", ::nameHandler),
+                            Pair("style", ::styleHandler)
+                            )
   val params = queryParams(request.url)
   var hello = "Hello, World!"
   for (param in params) {
