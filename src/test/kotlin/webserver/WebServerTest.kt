@@ -88,7 +88,6 @@ class WebServerTest {
     assertEquals(listOf(), queryParams("http://www.imperial.ac.uk/computing"))
   }
 
-
   @Test
   fun `says hello world`() {
     val request = Request("http://www.imperial.ac.uk/say-hello")
@@ -176,7 +175,8 @@ class WebServerTest {
 
     val app = configureRoutes(
       mapOf(
-        Pair("/", ::homePageHandler), Pair("/say-hello", ::helloHandler),
+        Pair("/", ::homePageHandler),
+        Pair("/say-hello", ::helloHandler),
         Pair("/computing", ::computingPageHandler)
       )
     )
@@ -198,7 +198,8 @@ class WebServerTest {
 
     val app = configureRoutes(
       mapOf(
-        Pair("/", ::homePageHandler), Pair("/say-hello", ::helloHandler),
+        Pair("/", ::homePageHandler),
+        Pair("/say-hello", ::helloHandler),
         Pair("/computing", ::computingPageHandler),
         Pair("/exam-marks", requireToken("password1", ::examMarksHandler))
       )
@@ -213,7 +214,8 @@ class WebServerTest {
 
     val app = configureRoutes(
       mapOf(
-        Pair("/", ::homePageHandler), Pair("/say-hello", ::helloHandler),
+        Pair("/", ::homePageHandler),
+        Pair("/say-hello", ::helloHandler),
         Pair("/computing", ::computingPageHandler),
         Pair("/exam-marks", requireToken("password1", ::examMarksHandler))
       )
