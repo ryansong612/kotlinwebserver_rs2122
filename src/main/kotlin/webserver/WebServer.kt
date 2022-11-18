@@ -26,10 +26,10 @@ fun queryParams(url: String): List<Pair<String, String>> {
 fun route(request: Request): Response {
   val url = request.url
   return when (path(url)) {
-    "/" -> homePageHandler(request)
+    "/"          -> homePageHandler(request)
     "/say-hello" -> helloHandler(request)
     "/computing" -> computingPageHandler(request)
-    else -> errorHandler(request)
+    else         -> errorHandler(request)
   }
 }
 
@@ -61,9 +61,9 @@ fun nameHandler(name: String, param: String): String =
 // if the query parameter had style in there
 fun styleHandler(msg: String, param: String): String {
   return when (param) {
-    "shouting" -> msg.uppercase()
+    "shouting"   -> msg.uppercase()
     "whispering" -> msg.lowercase()
-    else -> msg
+    else         -> msg
   }
 }
 
