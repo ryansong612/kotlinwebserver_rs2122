@@ -33,6 +33,7 @@ fun route(request: Request): Response {
   }
 }
 
+// Handlers for different routing options
 fun homePageHandler(request: Request): Response =
   Response(Status.OK, "This is Imperial.")
 fun computingPageHandler(request: Request): Response =
@@ -53,8 +54,11 @@ fun helloHandler(request: Request): Response {
   return Response(Status.OK, hello)
 }
 
+// if the query parameter had nane in there
 fun nameHandler(name: String, param: String): String =
   "Hello, $param!"
+
+// if the query parameter had style in there
 fun styleHandler(msg: String, param: String): String {
   return when (param) {
     "shouting" -> msg.uppercase()
