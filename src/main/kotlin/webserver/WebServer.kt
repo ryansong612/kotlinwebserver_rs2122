@@ -20,18 +20,25 @@ fun queryParams(url: String): List<Pair<String, String>> {
       .flatten()
   }
 }
-
 // http handlers for a particular website...
 
-fun route(request: Request): Response {
-  val url = request.url
-  return when (path(url)) {
-    "/"          -> homePageHandler(request)
-    "/say-hello" -> helloHandler(request)
-    "/computing" -> computingPageHandler(request)
-    else         -> errorHandler(request)
-  }
-}
+val mapping = mapOf(
+  ("/" to ::homePageHandler),
+  ("/say-hello" to ::helloHandler),
+  ("/computing" to ::computingPageHandler),
+  (
+    "/exam-marks" to requireToken("password1", ::examMarksHandler)
+    )
+)
+
+fun route(request: Request): Response = configureRoutes(mapping).invoke(request)
+//  val url = request.url
+//  return when (path(url)) {
+//    "/"          -> homePageHandler(request)
+//    "/say-hello" -> helloHandler(request)
+//    "/computing" -> computingPageHandler(request)
+//    else         -> errorHandler(request)
+//  }
 
 // Handlers for different routing options
 fun homePageHandler(request: Request): Response =
@@ -68,7 +75,10 @@ fun styleHandler(msg: String, param: String): String {
 }
 
 fun configureRoutes(routeMap: Map<String, HttpHandler>): HttpHandler =
-  { requests -> routeMap[path(requests.url)]!!.invoke(requests) }
+  { requests ->
+    routeMap.getOrDefault(path(requests.url), ::errorHandler)
+      .invoke(requests)
+  }
 
 fun requireToken(token: String, wrapped: HttpHandler): HttpHandler {
   return { request ->

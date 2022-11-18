@@ -173,13 +173,7 @@ class WebServerTest {
   @Test
   fun `calling configureRoutes() returns app which can handle requests`() {
 
-    val app = configureRoutes(
-      mapOf(
-        Pair("/", ::homePageHandler),
-        Pair("/say-hello", ::helloHandler),
-        Pair("/computing", ::computingPageHandler)
-      )
-    )
+    val app = configureRoutes(mapping)
 
     assertEquals(
       "This is Imperial.",
@@ -196,14 +190,7 @@ class WebServerTest {
   @Test
   fun `filter prevents access to protected resources `() {
 
-    val app = configureRoutes(
-      mapOf(
-        Pair("/", ::homePageHandler),
-        Pair("/say-hello", ::helloHandler),
-        Pair("/computing", ::computingPageHandler),
-        Pair("/exam-marks", requireToken("password1", ::examMarksHandler))
-      )
-    )
+    val app = configureRoutes(mapping)
 
     val request = Request("http://www.imperial.ac.uk/exam-marks")
     assertEquals(Status.FORBIDDEN, app(request).status)
@@ -212,14 +199,7 @@ class WebServerTest {
   @Test
   fun `filter allows access to protected resources with token`() {
 
-    val app = configureRoutes(
-      mapOf(
-        Pair("/", ::homePageHandler),
-        Pair("/say-hello", ::helloHandler),
-        Pair("/computing", ::computingPageHandler),
-        Pair("/exam-marks", requireToken("password1", ::examMarksHandler))
-      )
-    )
+    val app = configureRoutes(mapping)
 
     val request = Request("http://www.imperial.ac.uk/exam-marks", "password1")
     assertEquals(Status.OK, app(request).status)
